@@ -6,9 +6,9 @@ require_once '../bootstrap.php';
 use NFePHP\Serializer\XmlParser;
 
 $filename = '35160658716523000119550000000413101703406429-nfe.xml';
-$obj = new XmlParser();
-
-$data = $obj->xmlToObj($filename);
+//$obj = new XmlParser();
+//$data = $obj->xmlToObj($filename);
+$data = XmlParser::xmlToObj($filename);
 $obj = null;
 
 /*
@@ -19,8 +19,9 @@ echo '<BR><BR><BR>';
 */
 
 header('Content-type: text/xml; charset=UTF-8');
-$nOb = new XmlParser();
-echo $nOb->objToXml($data);
+//$nOb = new XmlParser();
+//echo $nOb->objToXml($data);
+echo XmlParser::objToXml($data);
 
 /*
 //converte xml para simplexml class
