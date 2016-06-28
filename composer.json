@@ -3,8 +3,8 @@
     "type": "library",
     "description": "Serialiser XML",
     "keywords": ["xml", "sped", "nfephp"],
-    "homepage": "https://github.com/nfephp-org/sped-cte",
-    "license": ["GPL-3.0+","LGPL-3.0+", "MIT"],
+    "homepage": "https://github.com/nfephp-org/sped-serializer",
+    "license": ["GPL-3.0+","LGPL-3.0+","MIT"],
     "authors": [
         {
             "name": "Roberto L. Machado",
