@@ -20,7 +20,7 @@ echo '<BR><BR><BR>';
 
 header('Content-type: text/xml; charset=UTF-8');
 $nOb = new XmlParser();
-echo $nOb->objToXML($data);
+echo $nOb->objToXml($data);
 
 /*
 //converte xml para simplexml class

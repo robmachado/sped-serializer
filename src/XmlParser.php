@@ -31,12 +31,15 @@ class XmlParser
      * @param StdClass $obj
      * @return string
      */
-    public function objToXML($obj)
+    public function objToXml($obj)
     {
         $this->getObject2XML($this->xml, $obj);
         $this->xml->endElement();
         $xml = $this->xml->outputMemory(true);
-        return $this->addAttibuteNS($xml);
+        if (strpos($xml, 'xmlns') === false) {
+            return $this->addAttibuteNS($xml);
+        }
+        return $xml;
     }
  
     /**
