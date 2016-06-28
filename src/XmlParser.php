@@ -39,37 +39,31 @@ class XmlParser
         self::$xml->endElement();
         $xml = self::$xml->outputMemory(true);
         if (strpos($xml, 'xmlns') === false) {
-            return self::addAttibuteNS($xml);
+            $xml = self::addAttibuteNS($xml);
         }
-        return $xml;
+        $xml = str_replace("\n", "", $xml);
+        return $xml."\n";
     }
  
     /**
      * Converte um XML em um objeto StdClass
      * @param string $xml
-     * @return StdClass
+     * @return bool | StdClass
      */
-    public static function xmlToObj($xml)
+    public static function xmlToObj($xml = '')
     {
+        if (empty($xml)) {
+            return false;
+        }
         $xmlString = $xml;
         if (is_file($xmlString)) {
             $xmlString = file_get_contents($xmlString);
         }
-        $xmlString = str_replace('<?xml version="1.0" encoding="UTF-8"?>','', $xmlString);
+        $xmlString = str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', $xmlString);
         $xmlString = '<root>'.$xmlString.'</root>';
         $resp = simplexml_load_string($xmlString);
-        $ns = $resp->getNamespaces(true);
-        //self::$xmlns = $ns[''];
         $std = json_encode($resp);
-        //remove o @ do marcador de attibutos do SimpleXML, isso é necessário para permitir a leitura do
-        //campo diretamente do objeto gerado pois o @ causa erro na leitura
-        $std = str_replace('@', '', $std);
-        //esta parte do codigo, abaixo é muito RUIM mas sem isso não teremos o namespace, pois não é exportado para 
-        //o json string
-        //$std = str_replace('"nfeProc":{"attributes":{', '"nfeProc":{"attributes":{"xmlns":"'.self::$xmlns.'",', $std);
-        //$std = str_replace('"NFe":{', '"NFe":{"attributes":{"xmlns":"'.self::$xmlns.'"},', $std);
-        //teria que adptar para CTe e outros ou simplesmente não exportar isso e deixar por conta do construtor do xml
-        //usando DOM para inserir o namespace
+        $std = str_replace('@attributes', 'attributes', $std);
         $std = json_decode($std);
         return $std;
     }
@@ -90,7 +84,8 @@ class XmlParser
             'cteProc' => 'http://www.portalfiscal.inf.br/cte',
             'CTe' => 'http://www.portalfiscal.inf.br/cte',
             'mdfeProc' => 'http://www.portalfiscal.inf.br/mdfe',
-            'MDFe' => 'http://www.portalfiscal.inf.br/mdfe'
+            'MDFe' => 'http://www.portalfiscal.inf.br/mdfe',
+            'Signature' => 'http://www.w3.org/2000/09/xmldsig#'
         ];
         foreach ($aTags as $tag => $ns) {
             $node = $dom->getElementsByTagName($tag)->item(0);
@@ -148,7 +143,7 @@ class XmlParser
                 $xml->writeAttribute($key, $value);
                 $xml->endAttribute();
             }
-        }    
+        }
     }
     
     /**
