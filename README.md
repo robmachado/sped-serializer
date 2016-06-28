@@ -9,6 +9,9 @@
 [![License][ico-license]][link-packagist]
 [![Total Downloads][ico-downloads]][link-downloads]
 
+[![Issues][ico-issues]][link-issues]
+[![Forks][ico-forks]][link-forks]
+[![Stars][ico-stars]][link-stars]
 
 **A classe XmlParser::class permite basicamente duas operações:**
 
