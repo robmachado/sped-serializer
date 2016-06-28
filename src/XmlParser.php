@@ -11,33 +11,35 @@ use DOMDocument;
 
 class XmlParser
 {
-    private $xml;
+    private static $xml;
     private $xmlns = '';
     
     /**
-     * Construtor
-     * Instancia o XMLWriter
+     * Instância variáveis
      */
-    public function __construct()
+    private static function load()
     {
-        $this->xml = new XMLWriter();
-        $this->xml->openMemory();
-        $this->xml->startDocument('1.0', 'utf-8');
-        $this->xml->setIndent(false);
+        if (is_null(self::$xml)) {
+            self::$xml = new XMLWriter();
+            self::$xml->openMemory();
+            self::$xml->startDocument('1.0', 'utf-8');
+            self::$xml->setIndent(false);
+        }
     }
- 
+    
     /**
      * Converte um Objeto StdClass em XML
      * @param StdClass $obj
      * @return string
      */
-    public function objToXml($obj)
+    public static function objToXml($obj)
     {
-        $this->getObject2XML($this->xml, $obj);
-        $this->xml->endElement();
-        $xml = $this->xml->outputMemory(true);
+        self::load();
+        self::getObject2XML(self::$xml, $obj);
+        self::$xml->endElement();
+        $xml = self::$xml->outputMemory(true);
         if (strpos($xml, 'xmlns') === false) {
-            return $this->addAttibuteNS($xml);
+            return self::addAttibuteNS($xml);
         }
         return $xml;
     }
@@ -47,7 +49,7 @@ class XmlParser
      * @param string $xml
      * @return StdClass
      */
-    public function xmlToObj($xml)
+    public static function xmlToObj($xml)
     {
         $xmlString = $xml;
         if (is_file($xmlString)) {
@@ -57,15 +59,15 @@ class XmlParser
         $xmlString = '<root>'.$xmlString.'</root>';
         $resp = simplexml_load_string($xmlString);
         $ns = $resp->getNamespaces(true);
-        $this->xmlns = $ns[''];
+        //self::$xmlns = $ns[''];
         $std = json_encode($resp);
         //remove o @ do marcador de attibutos do SimpleXML, isso é necessário para permitir a leitura do
         //campo diretamente do objeto gerado pois o @ causa erro na leitura
         $std = str_replace('@', '', $std);
         //esta parte do codigo, abaixo é muito RUIM mas sem isso não teremos o namespace, pois não é exportado para 
         //o json string
-        //$std = str_replace('"nfeProc":{"attributes":{', '"nfeProc":{"attributes":{"xmlns":"'.$this->xmlns.'",', $std);
-        //$std = str_replace('"NFe":{', '"NFe":{"attributes":{"xmlns":"'.$this->xmlns.'"},', $std);
+        //$std = str_replace('"nfeProc":{"attributes":{', '"nfeProc":{"attributes":{"xmlns":"'.self::$xmlns.'",', $std);
+        //$std = str_replace('"NFe":{', '"NFe":{"attributes":{"xmlns":"'.self::$xmlns.'"},', $std);
         //teria que adptar para CTe e outros ou simplesmente não exportar isso e deixar por conta do construtor do xml
         //usando DOM para inserir o namespace
         $std = json_decode($std);
@@ -76,7 +78,7 @@ class XmlParser
      * Adiciona os atributos namespace nas devidas tags
      * @param string $xml
      */
-    private function addAttibuteNS($xml)
+    private static function addAttibuteNS($xml)
     {
         $dom = new DOMDocument('1.0', 'utf-8');
         $dom->formatOutput = false;
@@ -107,20 +109,20 @@ class XmlParser
      * @param XMLWriter $xml
      * @param StdClass $data
      */
-    private function getObject2XML(XMLWriter $xml, $data)
+    private static function getObject2XML(XMLWriter $xml, $data)
     {
         foreach ($data as $key => $value) {
             if ($key == 'attributes') {
-                $this->getAttibutes($xml, $value);
+                self::getAttibutes($xml, $value);
                 continue;
             }
             if (is_object($value)) {
                 $xml->startElement($key);
-                $this->getObject2XML($xml, $value);
+                self::getObject2XML($xml, $value);
                 $xml->endElement();
                 continue;
             } elseif (is_array($value)) {
-                $this->getArray2XML($xml, $key, $value);
+                self::getArray2XML($xml, $key, $value);
             }
             if (is_string($value)) {
                 $xml->writeElement($key, $value);
@@ -133,14 +135,14 @@ class XmlParser
      * @param XMLWriter $xml
      * @param StdClass $data
      */
-    private function getAttibutes(XMLWriter $xml, $data)
+    private static function getAttibutes(XMLWriter $xml, $data)
     {
         foreach ($data as $key => $value) {
             if (is_object($value)) {
-                $this->getAttibutes($xml, $value);
+                self::getAttibutes($xml, $value);
                 continue;
             } elseif (is_array($value)) {
-                $this->getArray2XML($xml, $key, $value);
+                self::getArray2XML($xml, $key, $value);
             }
             if (is_string($value)) {
                 $xml->writeAttribute($key, $value);
@@ -155,7 +157,7 @@ class XmlParser
      * @param string $keyParent
      * @param StdClass $data
      */
-    private function getArray2XML(XMLWriter $xml, $keyParent, $data)
+    private static function getArray2XML(XMLWriter $xml, $keyParent, $data)
     {
         foreach ($data as $key => $value) {
             if (is_string($value)) {
@@ -166,9 +168,9 @@ class XmlParser
                 $xml->startElement($keyParent);
             }
             if (is_object($value)) {
-                $this->getObject2XML($xml, $value);
+                self::getObject2XML($xml, $value);
             } elseif (is_array($value)) {
-                $this->getArray2XML($xml, $key, $value);
+                self::getArray2XML($xml, $key, $value);
                 continue;
             }
             if (is_numeric($key)) {
