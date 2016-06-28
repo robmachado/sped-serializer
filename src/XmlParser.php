@@ -12,7 +12,6 @@ use DOMDocument;
 class XmlParser
 {
     private static $xml;
-    private $xmlns = '';
     
     /**
      * Instância variáveis
@@ -94,7 +93,6 @@ class XmlParser
                 $domAttribute->value = $ns;
                 $node->appendChild($domAttribute);
             }
-            $node = null;
         }
         return $dom->saveXML();
     }
