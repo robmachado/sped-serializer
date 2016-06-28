@@ -6,7 +6,7 @@
 
 1 - Método estático XmlParser::xmlToObj()
 
-Converte um XML em um Objeto do tipo StdClass do PHP para ser usado para extrair os dados do xml em programas PHP de forma mais simples e direta, ao invés de usar o DOM par essa operação.
+Converte um XML em um Objeto do tipo StdClass do PHP para ser usado para extrair os dados do xml em programas PHP de forma mais simples e direta, ao invés de usar o DOM para essa operação.
 
 2 - Método estático XmlParser::objToXml()
 
